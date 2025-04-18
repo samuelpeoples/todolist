@@ -1,0 +1,50 @@
+@import './../node_modules/normalize.css/normalize.css';
+
+* {
+	box-sizing: border-box;
+}
+
+html, body{
+	width: 100%;
+	height: 100%;
+}
+
+body{
+	display: flex;
+	flex-direction: column;
+}
+
+main {
+	flex: 1 1 0;
+}
+
+header,
+main,
+footer{
+	display: flex;
+	justify-content: center;
+}
+
+#project-wrapper{
+	display: flex;
+	gap: 20px;
+}
+
+.project-container{
+	width: 200px;
+	min-height: 100px;
+	height: fit-content;
+	padding: 10px;
+	border: 2px solid black;
+	border-radius: 1rem;
+	align-items: center;
+	display: flex;
+	flex-direction: column;
+	overflow: hidden;
+	text-wrap: wrap;
+}
+
+.project-title{
+	margin: 4px;
+	text-decoration: underline;
+}
