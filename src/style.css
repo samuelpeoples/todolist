@@ -2,6 +2,7 @@
 
 * {
 	box-sizing: border-box;
+	font-family: "Franklin Gothic Medium", "Arial Narrow", Arial, sans-serif;
 }
 
 html,
@@ -15,14 +16,18 @@ body {
 }
 
 main {
+	display: flex;
 	flex: 1 1 0;
 	padding: 24px;
 }
 
-header,
-main {
+header {
 	display: flex;
 	justify-content: center;
+}
+
+input {
+	min-width: 0px;
 }
 
 #project-wrapper {
@@ -36,8 +41,8 @@ main {
 
 #proj-button-block {
 	display: inline-block;
-	min-width: 100px;
-	height: 100px;
+	min-width: 80px;
+	height: 80px;
 	border: 2px solid rgb(209, 209, 209);
 	border-radius: 1rem;
 	display: flex;
@@ -48,18 +53,18 @@ main {
 #make-proj-button {
 	background-color: rgb(227, 231, 233);
 	border: 2px solid rgb(204, 208, 212);
-	border-radius: .4rem;
+	border-radius: 2rem;
 	width: 40px;
 	height: 40px;
 	font-size: 2.5rem;
 	line-height: 0px;
 }
 
-#make-proj-button:hover{
+#make-proj-button:hover {
 	background-color: rgb(236, 239, 243);
 }
 
-#make-proj-button:active{
+#make-proj-button:active {
 	background-color: rgb(227, 231, 233);
 }
 
@@ -78,72 +83,129 @@ main {
 	text-wrap: wrap;
 }
 
-.project-container > *{
+.project-container > * {
 	max-width: 200px;
 }
 
 .project-title {
+	font-size: 1.2rem;
+	border: none;
+	width: fit-content;
+	padding: 4px 8px;
 	margin: 4px;
 	text-decoration: underline;
 }
 
-#sidebar-wrapper{
+.project-title:hover,
+.project-title:focus,
+.subtask-title:hover,
+.subtask-title:focus,
+.task-title:hover,
+.task-title:focus {
+	background-color: aliceblue;
+}
+
+#sidebar-wrapper {
 	border-right: 4px solid grey;
 	background-color: aqua;
 	min-width: 200px;
-	width: 250px;
+	width: 200px;
 }
 
 .task-container {
 	display: flex;
 	flex-direction: column;
 	gap: 8px;
-	
 
 	padding: 10px 0px;
 	max-width: 200px;
-	font-size: .9rem;
+	font-size: 0.9rem;
 }
 
-.task-container > * {
-	width: 200px;
-}
-
-.task-container + .task-container{
+.task-container + .task-container {
 	border-top: 2px solid black;
 }
 
-.subtask-wrapper{
+.subtask-wrapper {
 	display: flex;
 	flex-direction: column;
 	gap: 8px;
 }
 
-.task-title{
-width: 165px;
-margin-right: auto;
-font-size: 1.2rem;
-}
-.make-subtask-button{
-	width: 30px;
-	height: 30px;
-	border-radius: 1rem;
+.task-title {
+	margin-right: auto;
+	font-size: 1rem;
 	border: none;
 }
 
+.make-subtask-button {
+	flex: none;
+	width: 20px;
+	height: 20px;
+	border-radius: 1rem;
+	padding: 0px;
+	border: none;
+}
+
+
+.make-task-button{
+	flex: none;
+	padding: 4px 8px;
+	border-radius: 1rem;
+	border: none;
+}
+.project-info,
 .task-info,
-.subtask-container{
+.subtask-container {
 	display: flex;
 	justify-content: center;
 	max-width: 200px;
+	gap: 6px;
+	align-items: center;
 }
 .task-info > *,
-.subtask-container > *{
+.subtask-container > * {
 	max-width: 175px;
-
 }
 
-.subtask-title{
-	width: 165px;
+.subtask-title {
+	max-width: 175px;
+	display: flex;
+	width: max-content;
+	border-radius: 0.2rem;
+	padding: 2px 4px;
+	border: 2px solid rgb(158, 158, 158);
 	margin-right: auto;
+}
+
+.subtask-check {
+	flex: none;
+	width: 15px;
+	height: 15px;
+}
+
+
+.project-delete-button,
+.task-delete-button,
+.subtask-delete-button {
+	background-color: rgb(253, 184, 184);
+	flex: none;
+	border-radius: 1rem;
+	font-size: 0.8rem;
+	border: none;
+	width: 20px;
+	height: 20px;
+	line-height: 20px;
+	line-height: 0px;
+	text-align:center;
+	justify-content:end;
+	padding: 0px;
+}
+
+.task-completed > *{
+	color: grey;
+	text-decoration:line-through;
+	text-decoration: underline;
+	text-underline-offset: -38%;
+	text-decoration-skip-ink: none;
 }
