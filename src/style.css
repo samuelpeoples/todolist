@@ -64,8 +64,8 @@ main {
 }
 
 .project-container {
-	min-width: 200px;
-	width: 200px;
+	min-width: 225px;
+	width: 225px;
 	min-height: 100px;
 	height: fit-content;
 	padding: 10px;
@@ -79,7 +79,7 @@ main {
 }
 
 .project-container > *{
-	max-width: 175px;
+	max-width: 200px;
 }
 
 .project-title {
@@ -99,12 +99,51 @@ main {
 	flex-direction: column;
 	gap: 8px;
 	
-	border-top: 2px solid black;
+
 	padding: 10px 0px;
-	max-width: 150px;
+	max-width: 200px;
 	font-size: .9rem;
 }
 
-.task-container > * > * {
-	max-width: 150px;
+.task-container > * {
+	width: 200px;
+}
+
+.task-container + .task-container{
+	border-top: 2px solid black;
+}
+
+.subtask-wrapper{
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+}
+
+.task-title{
+width: 165px;
+margin-right: auto;
+font-size: 1.2rem;
+}
+.make-subtask-button{
+	width: 30px;
+	height: 30px;
+	border-radius: 1rem;
+	border: none;
+}
+
+.task-info,
+.subtask-container{
+	display: flex;
+	justify-content: center;
+	max-width: 200px;
+}
+.task-info > *,
+.subtask-container > *{
+	max-width: 175px;
+
+}
+
+.subtask-title{
+	width: 165px;
+	margin-right: auto;
 }

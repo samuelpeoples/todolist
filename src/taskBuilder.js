@@ -1,20 +1,7 @@
-/*
-item properties:
-title,
-description, 
-due date, 
-created date,
-priority,
-type,
-sub-item checklist,
-notes
-
-*/
 const projectWrapper = document.getElementById("project-wrapper");
 const listWrapper = document.getElementById("list-wrapper");
 
 function buildProjButton() {
-
 	let projNum = 0;
 
 	const projButtonBlock = document.createElement("div");
@@ -25,8 +12,7 @@ function buildProjButton() {
 	makeProjButton.id = `make-proj-button`;
 	makeProjButton.textContent = "+";
 
-	makeProjButton.addEventListener('click', (a) => {
-		
+	makeProjButton.addEventListener("click", (a) => {
 		makeProject(`newTitle ${projNum}`);
 		projNum++;
 	});
@@ -64,9 +50,9 @@ function makeProject(title) {
 	projTitle.className = `project-title`;
 	projBlock.appendChild(projTitle);
 
-	const projDate = document.createElement("h5");
-	projDate.textContent = newProj.date;
-	projBlock.appendChild(projDate);
+	// const projDate = document.createElement("h5");
+	// projDate.textContent = newProj.date;
+	// projBlock.appendChild(projDate);
 
 	// const projId = document.createElement("h4");
 	// projId.textContent = newProj.id;
@@ -91,11 +77,11 @@ function buildTaskButton(projBlock, newProj) {
 	const makeTaskButton = document.createElement("button");
 	makeTaskButton.id = `make-task-button`;
 	makeTaskButton.textContent = "+";
-
 	makeTaskButton.addEventListener("click", (a) => {
 		makeTask(taskWrapper);
 	});
 	taskButtonBlock.appendChild(makeTaskButton);
+	makeTask(taskWrapper);
 }
 
 class Task {
@@ -135,34 +121,93 @@ function makeTask(taskContainer) {
 	taskBlock.id = `task_${newTask.id}`;
 	taskBlock.className = `task-container`;
 
-	const taskTitleBlock = document.createElement("div");
-
-	const taskTitleLabel = document.createElement("label");
-	taskTitleLabel.textContent = "Title"
-	taskTitleLabel.for = "taskTitle";
-	taskTitleBlock.appendChild(taskTitleLabel);
+	const taskInfo = document.createElement("div");
+	taskInfo.className = "task-info"
 	
 	const taskTitle = document.createElement("input");
-	taskTitle.name = "taskTitle"
+	taskTitle.placeholder = "Task...";
+	taskTitle.name = "taskTitle";
 	taskTitle.type = "text";
 	if (newTask.title != undefined) taskTitle.value = newTask.title;
 	else taskTitle.value = "";
 	taskTitle.className = `task-title`;
-	taskTitleBlock.appendChild(taskTitle);
-	taskBlock.appendChild(taskTitleBlock);
 
-	const taskDate = document.createElement("span");
-	taskDate.textContent = newTask.date;
-	taskBlock.appendChild(taskDate);
+	taskInfo.appendChild(taskTitle);
+	
+	taskBlock.appendChild(taskInfo);
+
+	// const taskDate = document.createElement("span");
+	// taskDate.textContent = newTask.date;
+	// taskBlock.appendChild(taskDate);
+	const subtaskWrapper = document.createElement("div");
+	subtaskWrapper.className = "subtask-wrapper";
+	taskBlock.appendChild(subtaskWrapper);
+
+	const makeSubTaskButton = document.createElement("button");
+	makeSubTaskButton.className = `make-subtask-button`;
+	makeSubTaskButton.textContent = "+";
+	makeSubTaskButton.addEventListener("click", (a) => {
+		makeSubTask(subtaskWrapper);
+	});
+	taskInfo.appendChild(makeSubTaskButton);
 
 	// const projId = document.createElement("h4");
 	// projId.textContent = newProj.id;
 	// projId.className = `project-id`;
 	// projBlock.appendChild(projId);
-
 	taskContainer.appendChild(taskBlock);
+}
 
+class SubTask {
+	constructor(){
+		this.id = self.crypto.randomUUID();
+		this.complete = false;
+		this.title = "";
+	}
+	get title(){
+		return this._title;
+	}
+	set title(text){
+		this._title = text;
+	}
+	get complete() {
+		return this._complete;
+	}
+	set complete(value) {
+		this._complete = value;
+	}
+}
 
+function makeSubTask(taskBlock) {
+	const subTask = new SubTask();
+
+	const subtaskContainer = document.createElement("div");
+	subtaskContainer.id = `subtask_${subTask.id}`;
+	subtaskContainer.className = "subtask-container";
+	
+	const subtaskTitle = document.createElement("input"); 
+	subtaskTitle.className = "subtask-title";
+	subtaskTitle.placeholder = "Task...";
+	subtaskTitle.name = "subtask-title";
+	subtaskTitle.type = "text";
+	subtaskTitle.addEventListener('change', (e) => {
+		subTask.title = e.target.value;
+		console.log(`${subTask.title} is ${subTask.complete}`);
+	});
+	
+	subtaskContainer.appendChild(subtaskTitle);
+
+	const subtaskCheck = document.createElement("input"); 
+	subtaskCheck.className = "subtask-check";
+	subtaskCheck.checked = subTask.complete;
+	subtaskCheck.name = "subtask-check";
+	subtaskCheck.type = "checkbox";
+	subtaskCheck.addEventListener('change', (e) => {
+		subTask.complete = e.target.checked;
+		console.log(`${subTask.title} is ${subTask.complete}`);
+	});
+	subtaskContainer.appendChild(subtaskCheck);
+	taskBlock.appendChild(subtaskContainer);
 }
 
 buildProjButton();
