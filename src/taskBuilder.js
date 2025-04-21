@@ -57,6 +57,7 @@ function makeProject(title) {
 	projectDelete.className = "project-delete-button";
 	projectDelete.name = "project-delete-button";
 	projectDelete.textContent = "X";
+	projectDelete.title = "Delete Project";
 	projectDelete.addEventListener('click', () => {
 		projBlock.remove();
 	});
@@ -73,12 +74,7 @@ function makeProject(title) {
 
 	projectWrapper.appendChild(projBlock);
 	console.log(newProj.id);
-
-
-
 	buildTaskButton(projBlock, newProj);
-
-
 }
 
 function buildTaskButton(projBlock, newProj) {
@@ -153,16 +149,57 @@ function makeTask(taskContainer) {
 	
 	taskBlock.appendChild(taskInfo);
 
-	// const taskDate = document.createElement("span");
-	// taskDate.textContent = newTask.date;
-	// taskBlock.appendChild(taskDate);
-	const subtaskWrapper = document.createElement("div");
-	subtaskWrapper.className = "subtask-wrapper";
-	taskBlock.appendChild(subtaskWrapper);
+	const taskInfoSecondary = document.createElement("div");
+	taskInfoSecondary.className = "task-info"
+	taskBlock.appendChild(taskInfoSecondary);
+
+	const taskDue = document.createElement("input"); 
+	taskDue.name = `task-due`;
+	taskDue.className = `task-due`;
+	taskDue.title = "Due Date";
+	taskDue.type = "date";
+	taskDue.min = new Date();
+	taskDue.valueAsDate = new Date();
+	taskInfoSecondary.appendChild(taskDue);
+
+	const taskPriority = document.createElement("select"); 
+	taskPriority.placeholder = "Priority:";
+	taskPriority.required = true;
+	taskPriority.name = `task-priority`;
+	taskPriority.className = `task-priority`;
+	taskPriority.title = "Task Priority";
+	taskInfoSecondary.appendChild(taskPriority);
+
+	const priorityOpt0 = document.createElement("option"); 
+	priorityOpt0.value = "";
+	priorityOpt0.disabled = true;
+	priorityOpt0.text = "Priority"
+	priorityOpt0.selected = true;
+	taskPriority.appendChild(priorityOpt0);
+	const priorityOpt1 = document.createElement("option"); 
+	priorityOpt1.value = "Low";
+	priorityOpt1.text = priorityOpt1.value;
+	taskPriority.appendChild(priorityOpt1);
+	const priorityOpt2 = document.createElement("option"); 
+	priorityOpt2.value = "Medium";
+	priorityOpt2.text = priorityOpt2.value;
+	taskPriority.appendChild(priorityOpt2);
+	const priorityOpt3 = document.createElement("option"); 
+	priorityOpt3.value = "High";
+	priorityOpt3.text = priorityOpt3.value;
+	taskPriority.appendChild(priorityOpt3);
+	const priorityOpt4 = document.createElement("option"); 
+	priorityOpt4.value = "Urgent";
+	priorityOpt4.text = priorityOpt4.value;
+	taskPriority.appendChild(priorityOpt4);
+
+
+
 
 	const makeSubTaskButton = document.createElement("button");
 	makeSubTaskButton.className = `make-subtask-button`;
 	makeSubTaskButton.textContent = "+";
+	makeSubTaskButton.title = "Create Sub-Task";
 	makeSubTaskButton.title = "Create Sub-Task";
 	makeSubTaskButton.addEventListener("click", (a) => {
 		makeSubTask(subtaskWrapper);
@@ -178,6 +215,27 @@ function makeTask(taskContainer) {
 		taskBlock.remove();
 	});
 	taskInfo.appendChild(taskDelete);
+
+
+
+	const taskDescription = document.createElement("textarea");
+
+	taskDescription.className = `task-description`;
+	taskDescription.placeholder = "Task Description...";
+	taskDescription.name = "task-description";
+	taskDescription.addEventListener('input', () => {
+		taskDescription.style.height = ""
+		taskDescription.style.height = taskDescription.scrollHeight + 6 + "px";
+	});
+
+	taskBlock.appendChild(taskDescription);
+
+	// const taskDate = document.createElement("span");
+	// taskDate.textContent = newTask.date;
+	// taskBlock.appendChild(taskDate);
+	const subtaskWrapper = document.createElement("div");
+	subtaskWrapper.className = "subtask-wrapper";
+	taskBlock.appendChild(subtaskWrapper);
 
 	// const projId = document.createElement("h4");
 	// projId.textContent = newProj.id;
