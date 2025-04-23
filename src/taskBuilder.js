@@ -11,10 +11,8 @@ function buildProjButton() {
 	const makeProjButton = document.createElement("button");
 	makeProjButton.id = `make-proj-button`;
 	makeProjButton.textContent = "+";
-	makeProject(`New Project ${projNum}`);
-	projNum++;
 	makeProjButton.addEventListener("click", (a) => {
-		makeProject(`New Project ${projNum}`);
+		createProject(`New Project ${projNum}`);
 		projNum++;
 	});
 	projButtonBlock.appendChild(makeProjButton);
@@ -24,7 +22,7 @@ class Project {
 	constructor(title) {
 		this.title = title;
 		this.date = new Date().toLocaleString();
-		this.id = self.crypto.randomUUID();
+		this.id = `proj_${self.crypto.randomUUID()}`;
 	}
 	addTask(tName, tDesc, tDue, tPriority, tType) {
 		const newTask = new Task(tName, tDesc, tDue, tPriority, tType);
@@ -35,13 +33,22 @@ class Project {
 	get id() {
 		return this._id;
 	}
+
+	readThis = () => localStorage.getItem(id);
+}
+let projectsList = [];
+
+function createProject(title) {
+	const newProj = new Project(title);
+	projectsList = JSON.parse(localStorage.getItem("ProjectList"));
+	projectsList.push(newProj);
+	localStorage.setItem("ProjectList", JSON.stringify(projectsList));
+	buildProjectUI(newProj);
 }
 
-function makeProject(title) {
-	const newProj = new Project(title);
-
+function buildProjectUI(newProj) {
 	const projBlock = document.createElement("div");
-	projBlock.id = `proj_${newProj.id}`;
+	projBlock.id = newProj.id;
 	projBlock.className = `project-container`;
 
 	const projInfo = document.createElement("div");
@@ -53,28 +60,43 @@ function makeProject(title) {
 	projTitle.className = `project-title`;
 	projInfo.appendChild(projTitle);
 
-	const projectDelete = document.createElement("button"); 
+	const projectDelete = document.createElement("button");
 	projectDelete.className = "project-delete-button";
 	projectDelete.name = "project-delete-button";
 	projectDelete.textContent = "X";
 	projectDelete.title = "Delete Project";
-	projectDelete.addEventListener('click', () => {
+
+	projectDelete.addEventListener("click", () => {
+		removeProjects(newProj);
 		projBlock.remove();
 	});
 	projInfo.appendChild(projectDelete);
 
-	// const projDate = document.createElement("h5");
-	// projDate.textContent = newProj.date;
-	// projBlock.appendChild(projDate);
-
-	// const projId = document.createElement("h4");
-	// projId.textContent = newProj.id;
-	// projId.className = `project-id`;
-	// projBlock.appendChild(projId);
-
 	projectWrapper.appendChild(projBlock);
 	console.log(newProj.id);
 	buildTaskButton(projBlock, newProj);
+}
+
+function loadProjects() {
+	const projects = JSON.parse(localStorage.getItem("ProjectList"));
+	if (projects) {
+		projects.forEach((element) => {
+			buildProjectUI(element);
+		});
+	}
+}
+
+function removeProjects(newProj) {
+	const projects = JSON.parse(localStorage.getItem("ProjectList"));
+	if (projects) {
+		projects.forEach((element) => {
+			let projects = JSON.parse(localStorage.getItem("ProjectList"));
+			if (projects) {
+				projectsList = projects.filter((proj) => proj._id != newProj._id);
+				localStorage.setItem("ProjectList", JSON.stringify(projectsList));
+			}
+		});
+	}
 }
 
 function buildTaskButton(projBlock, newProj) {
@@ -135,8 +157,8 @@ function makeTask(taskContainer) {
 	taskBlock.className = `task-container`;
 
 	const taskInfo = document.createElement("div");
-	taskInfo.className = "task-info"
-	
+	taskInfo.className = "task-info";
+
 	const taskTitle = document.createElement("input");
 	taskTitle.placeholder = "Task Title...";
 	taskTitle.name = "taskTitle";
@@ -146,14 +168,14 @@ function makeTask(taskContainer) {
 	taskTitle.className = `task-title`;
 
 	taskInfo.appendChild(taskTitle);
-	
+
 	taskBlock.appendChild(taskInfo);
 
 	const taskInfoSecondary = document.createElement("div");
-	taskInfoSecondary.className = "task-info"
+	taskInfoSecondary.className = "task-info";
 	taskBlock.appendChild(taskInfoSecondary);
 
-	const taskDue = document.createElement("input"); 
+	const taskDue = document.createElement("input");
 	taskDue.name = `task-due`;
 	taskDue.className = `task-due`;
 	taskDue.title = "Due Date";
@@ -162,7 +184,7 @@ function makeTask(taskContainer) {
 	taskDue.valueAsDate = new Date();
 	taskInfoSecondary.appendChild(taskDue);
 
-	const taskPriority = document.createElement("select"); 
+	const taskPriority = document.createElement("select");
 	taskPriority.placeholder = "Priority:";
 	taskPriority.required = true;
 	taskPriority.name = `task-priority`;
@@ -170,31 +192,28 @@ function makeTask(taskContainer) {
 	taskPriority.title = "Task Priority";
 	taskInfoSecondary.appendChild(taskPriority);
 
-	const priorityOpt0 = document.createElement("option"); 
+	const priorityOpt0 = document.createElement("option");
 	priorityOpt0.value = "";
 	priorityOpt0.disabled = true;
-	priorityOpt0.text = "Priority"
+	priorityOpt0.text = "Priority";
 	priorityOpt0.selected = true;
 	taskPriority.appendChild(priorityOpt0);
-	const priorityOpt1 = document.createElement("option"); 
+	const priorityOpt1 = document.createElement("option");
 	priorityOpt1.value = "Low";
 	priorityOpt1.text = priorityOpt1.value;
 	taskPriority.appendChild(priorityOpt1);
-	const priorityOpt2 = document.createElement("option"); 
+	const priorityOpt2 = document.createElement("option");
 	priorityOpt2.value = "Medium";
 	priorityOpt2.text = priorityOpt2.value;
 	taskPriority.appendChild(priorityOpt2);
-	const priorityOpt3 = document.createElement("option"); 
+	const priorityOpt3 = document.createElement("option");
 	priorityOpt3.value = "High";
 	priorityOpt3.text = priorityOpt3.value;
 	taskPriority.appendChild(priorityOpt3);
-	const priorityOpt4 = document.createElement("option"); 
+	const priorityOpt4 = document.createElement("option");
 	priorityOpt4.value = "Urgent";
 	priorityOpt4.text = priorityOpt4.value;
 	taskPriority.appendChild(priorityOpt4);
-
-
-
 
 	const makeSubTaskButton = document.createElement("button");
 	makeSubTaskButton.className = `make-subtask-button`;
@@ -206,25 +225,23 @@ function makeTask(taskContainer) {
 	});
 	taskInfo.appendChild(makeSubTaskButton);
 
-	const taskDelete = document.createElement("button"); 
+	const taskDelete = document.createElement("button");
 	taskDelete.className = "task-delete-button";
 	taskDelete.name = "task-delete-button";
 	taskDelete.textContent = "X";
 	taskDelete.title = "Delete Task";
-	taskDelete.addEventListener('click', () => {
+	taskDelete.addEventListener("click", () => {
 		taskBlock.remove();
 	});
 	taskInfo.appendChild(taskDelete);
-
-
 
 	const taskDescription = document.createElement("textarea");
 
 	taskDescription.className = `task-description`;
 	taskDescription.placeholder = "Task Description...";
 	taskDescription.name = "task-description";
-	taskDescription.addEventListener('input', () => {
-		taskDescription.style.height = ""
+	taskDescription.addEventListener("input", () => {
+		taskDescription.style.height = "";
 		taskDescription.style.height = taskDescription.scrollHeight + 6 + "px";
 	});
 
@@ -245,15 +262,15 @@ function makeTask(taskContainer) {
 }
 
 class SubTask {
-	constructor(){
+	constructor() {
 		this.id = self.crypto.randomUUID();
 		this.complete = false;
 		this.title = "";
 	}
-	get title(){
+	get title() {
 		return this._title;
 	}
-	set title(text){
+	set title(text) {
 		this._title = text;
 	}
 	get complete() {
@@ -270,42 +287,41 @@ function makeSubTask(taskBlock) {
 	const subtaskContainer = document.createElement("div");
 	subtaskContainer.id = `subtask_${subTask.id}`;
 	subtaskContainer.className = "subtask-container";
-	
-	const subtaskTitle = document.createElement("input"); 
+
+	const subtaskTitle = document.createElement("input");
 	subtaskTitle.className = "subtask-title";
 	subtaskTitle.placeholder = "Task...";
 	subtaskTitle.name = "subtask-title";
 	subtaskTitle.type = "text";
 	subtaskTitle.title = "Sub-Task Title";
-	subtaskTitle.addEventListener('change', (e) => {
+	subtaskTitle.addEventListener("change", (e) => {
 		subTask.title = e.target.value;
 		console.log(`${subTask.title} is ${subTask.complete}`);
 	});
-	
+
 	subtaskContainer.appendChild(subtaskTitle);
 
-	const subtaskCheck = document.createElement("input"); 
+	const subtaskCheck = document.createElement("input");
 	subtaskCheck.className = "subtask-check";
 	subtaskCheck.checked = subTask.complete;
 	subtaskCheck.name = "subtask-check";
 	subtaskCheck.type = "checkbox";
 	subtaskCheck.title = "Sub-Task Completed";
-	subtaskCheck.addEventListener('change', (e) => {
+	subtaskCheck.addEventListener("change", (e) => {
 		subTask.complete = e.target.checked;
-		if(subTask.complete){
+		if (subTask.complete) {
 			subtaskContainer.classList.add("task-completed");
-		}
-		else subtaskContainer.classList.remove("task-completed");
+		} else subtaskContainer.classList.remove("task-completed");
 		console.log(`${subTask.title} is ${subTask.complete}`);
 	});
 	subtaskContainer.appendChild(subtaskCheck);
 
-	const subtaskDelete = document.createElement("button"); 
+	const subtaskDelete = document.createElement("button");
 	subtaskDelete.className = "subtask-delete-button";
 	subtaskDelete.name = "subtask-delete-button";
 	subtaskDelete.textContent = "X";
 	subtaskDelete.title = "Delete Sub-Task";
-	subtaskDelete.addEventListener('click', () => {
+	subtaskDelete.addEventListener("click", () => {
 		subtaskContainer.remove();
 	});
 	subtaskContainer.appendChild(subtaskDelete);
@@ -314,4 +330,6 @@ function makeSubTask(taskBlock) {
 
 buildProjButton();
 
-export { makeProject, buildProjButton };
+loadProjects();
+
+export { createProject, buildProjButton };

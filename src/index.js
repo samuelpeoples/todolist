@@ -1,5 +1,5 @@
 require("./style.css");
-import { buildProjButton } from "./taskBuilder";
+import { projectsList } from "./taskBuilder";
 
 /*
 item properties:
