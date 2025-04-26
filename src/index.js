@@ -1,5 +1,5 @@
 require("./style.css");
-import { projectsList } from "./taskBuilder";
+import { projectsList, taskList } from "./taskBuilder.js";
 
 /*
 item properties:
@@ -13,4 +13,3 @@ sub-item checklist,
 notes
 
 */
-const projectWrapper = document.getElementById("project-wrapper");

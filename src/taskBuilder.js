@@ -40,9 +40,9 @@ class Project {
 let projectList = [];
 
 function createProject(title) {
-
 	const newProj = new Project(title);
-	if (JSON.parse(localStorage.getItem("ProjectList") != null)) projectList = JSON.parse(localStorage.getItem("ProjectList"));
+	if (JSON.parse(localStorage.getItem("ProjectList") != null))
+		projectList = JSON.parse(localStorage.getItem("ProjectList"));
 
 	projectList.push(newProj);
 	localStorage.setItem("ProjectList", JSON.stringify(projectList));
@@ -58,7 +58,7 @@ function buildProjectUI(newProj) {
 	projInfo.className = `project-info`;
 	projBlock.appendChild(projInfo);
 	const projTitle = document.createElement("input");
-	if (newProj.title != undefined) projTitle.value = newProj.title;
+	if (newProj.title != undefined) projTitle.value = newProj._title;
 	else projTitle.value = "";
 	projTitle.className = `project-title`;
 	projInfo.appendChild(projTitle);
@@ -76,7 +76,7 @@ function buildProjectUI(newProj) {
 	projInfo.appendChild(projectDelete);
 
 	projectWrapper.appendChild(projBlock);
-	console.log(newProj.id);
+	console.log(newProj._id);
 	buildTaskButton(newProj._id);
 }
 
@@ -140,7 +140,6 @@ let taskList = [];
 function buildTaskButton(projectID) {
 	const projBlock = document.getElementById(projectID);
 
-
 	const taskButtonBlock = document.createElement("div");
 	taskButtonBlock.className = `task-button-block`;
 	projBlock.appendChild(taskButtonBlock);
@@ -160,10 +159,9 @@ function buildTaskButton(projectID) {
 	// makeTask(projectID);
 }
 
-function makeTask(projectID){
-
+function makeTask(projectID) {
 	const newTask = new Task(projectID);
-	if(JSON.parse(localStorage.getItem("TaskList")) != null) taskList = JSON.parse(localStorage.getItem("TaskList"));
+	if (JSON.parse(localStorage.getItem("TaskList")) != null) taskList = JSON.parse(localStorage.getItem("TaskList"));
 	taskList.push(newTask);
 	localStorage.setItem("TaskList", JSON.stringify(taskList));
 	buildTaskUI(newTask);
@@ -173,7 +171,7 @@ function buildTaskUI(newTask) {
 	const taskContainer = document.getElementById(newTask.project).querySelector(".task-wrapper");
 
 	const taskBlock = document.createElement("div");
-	taskBlock.id = `task_${newTask.id}`;
+	taskBlock.id = `task_${newTask._id}`;
 	taskBlock.className = `task-container`;
 
 	const taskInfo = document.createElement("div");
@@ -184,8 +182,17 @@ function buildTaskUI(newTask) {
 	taskTitle.name = "taskTitle";
 	taskTitle.type = "text";
 	if (newTask.title != undefined) taskTitle.value = newTask.title;
-	else taskTitle.value = "";
 	taskTitle.className = `task-title`;
+
+	taskTitle.addEventListener("keyup", (e) => {
+		taskList = JSON.parse(localStorage.getItem("TaskList"));
+		for (const task of taskList) {
+			if ((task._id == newTask._id)) {
+				task.title = e.target.value;
+				localStorage.setItem("TaskList", JSON.stringify(taskList));
+			}
+		}
+	});
 
 	taskInfo.appendChild(taskTitle);
 
@@ -280,6 +287,11 @@ function buildTaskUI(newTask) {
 	// projId.className = `project-id`;
 	// projBlock.appendChild(projId);
 	taskContainer.appendChild(taskBlock);
+}
+
+function updateTask(attribute, value) {
+	attribute = value;
+	localStorage.setItem("TaskList", JSON.stringify(taskList));
 }
 
 function loadTasks() {
