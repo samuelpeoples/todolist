@@ -42,7 +42,7 @@ let projectList = [];
 function createProject(title) {
 	const newProj = new Project(title);
 	if (JSON.parse(localStorage.getItem("ProjectList") != null))
-		projectList = JSON.parse(localStorage.getItem("ProjectList"));
+		projectList = JSON.parse(localStorage.getItem("ProjectList") || '[]');
 
 	projectList.push(newProj);
 	localStorage.setItem("ProjectList", JSON.stringify(projectList));
@@ -58,7 +58,7 @@ function buildProjectUI(newProj) {
 	projInfo.className = `project-info`;
 	projBlock.appendChild(projInfo);
 	const projTitle = document.createElement("input");
-	if (newProj.title != undefined) projTitle.value = newProj._title;
+	if (newProj.title != undefined) projTitle.value = newProj.title;
 	else projTitle.value = "";
 	projTitle.className = `project-title`;
 	projInfo.appendChild(projTitle);
@@ -76,13 +76,12 @@ function buildProjectUI(newProj) {
 	projInfo.appendChild(projectDelete);
 
 	projectWrapper.appendChild(projBlock);
-	console.log(newProj._id);
 	buildTaskButton(newProj._id);
 }
 
 function loadProjects() {
 	if (JSON.parse(localStorage.getItem("ProjectList") == null)) return;
-	const projects = JSON.parse(localStorage.getItem("ProjectList"));
+	const projects = JSON.parse(localStorage.getItem("ProjectList") || '[]');
 
 	if (projects) {
 		projects.forEach((element) => {
@@ -93,10 +92,10 @@ function loadProjects() {
 
 function removeProjects(newProj) {
 	if (JSON.parse(localStorage.getItem("ProjectList") == null)) return;
-	const projects = JSON.parse(localStorage.getItem("ProjectList"));
+	const projects = JSON.parse(localStorage.getItem("ProjectList") || '[]');
 	if (projects) {
 		projects.forEach((element) => {
-			let projects = JSON.parse(localStorage.getItem("ProjectList"));
+			let projects = JSON.parse(localStorage.getItem("ProjectList") || '[]');
 			if (projects) {
 				projectList = projects.filter((proj) => proj._id != newProj._id);
 				localStorage.setItem("ProjectList", JSON.stringify(projectList));
@@ -114,7 +113,8 @@ class Task {
 		this.priority = priority;
 		this.type = type;
 		this.date = new Date().toLocaleString();
-		this.id = self.crypto.randomUUID();
+		this.id = `task_${self.crypto.randomUUID()}`;
+		this.subTaskList = [];
 	}
 	set title(name) {
 		this._title = name;
@@ -126,7 +126,7 @@ class Task {
 		this._id = id;
 	}
 	get id() {
-		return this._id;
+		return _id;
 	}
 	set priority(level) {
 		this._priority = level;
@@ -161,7 +161,7 @@ function buildTaskButton(projectID) {
 
 function makeTask(projectID) {
 	const newTask = new Task(projectID);
-	if (JSON.parse(localStorage.getItem("TaskList")) != null) taskList = JSON.parse(localStorage.getItem("TaskList"));
+	if (JSON.parse(localStorage.getItem("TaskList")) != null) taskList = JSON.parse(localStorage.getItem("TaskList") || '[]');
 	taskList.push(newTask);
 	localStorage.setItem("TaskList", JSON.stringify(taskList));
 	buildTaskUI(newTask);
@@ -171,7 +171,7 @@ function buildTaskUI(newTask) {
 	const taskContainer = document.getElementById(newTask.project).querySelector(".task-wrapper");
 
 	const taskBlock = document.createElement("div");
-	taskBlock.id = `task_${newTask._id}`;
+	taskBlock.id = newTask._id;
 	taskBlock.className = `task-container`;
 
 	const taskInfo = document.createElement("div");
@@ -185,13 +185,7 @@ function buildTaskUI(newTask) {
 	taskTitle.className = `task-title`;
 
 	taskTitle.addEventListener("keyup", (e) => {
-		taskList = JSON.parse(localStorage.getItem("TaskList"));
-		for (const task of taskList) {
-			if ((task._id == newTask._id)) {
-				task.title = e.target.value;
-				localStorage.setItem("TaskList", JSON.stringify(taskList));
-			}
-		}
+		updateTask(newTask, "title", e);
 	});
 
 	taskInfo.appendChild(taskTitle);
@@ -207,9 +201,14 @@ function buildTaskUI(newTask) {
 	taskDue.className = `task-due`;
 	taskDue.title = "Due Date";
 	taskDue.type = "date";
+
 	taskDue.min = new Date();
-	taskDue.valueAsDate = new Date();
+	if (newTask.dueDate != undefined) taskDue.value = newTask.dueDate;
+	newTask.dueDate = taskDue.value;
 	taskInfoSecondary.appendChild(taskDue);
+	taskDue.addEventListener("change", (e) => {
+		updateTask(newTask, "dueDate", e);
+	});
 
 	const taskPriority = document.createElement("select");
 	taskPriority.placeholder = "Priority:";
@@ -242,13 +241,19 @@ function buildTaskUI(newTask) {
 	priorityOpt4.text = priorityOpt4.value;
 	taskPriority.appendChild(priorityOpt4);
 
+	if (newTask.priority != undefined) taskPriority.value = newTask.priority;
+
+	taskPriority.addEventListener("change", (e) => {
+		updateTask(newTask, "priority", e);
+	});
+
 	const makeSubTaskButton = document.createElement("button");
 	makeSubTaskButton.className = `make-subtask-button`;
 	makeSubTaskButton.textContent = "+";
 	makeSubTaskButton.title = "Create Sub-Task";
 	makeSubTaskButton.title = "Create Sub-Task";
 	makeSubTaskButton.addEventListener("click", (a) => {
-		makeSubTask(subtaskWrapper);
+		makeSubTask(newTask);
 	});
 	taskInfo.appendChild(makeSubTaskButton);
 
@@ -264,13 +269,15 @@ function buildTaskUI(newTask) {
 	taskInfo.appendChild(taskDelete);
 
 	const taskDescription = document.createElement("textarea");
-
 	taskDescription.className = `task-description`;
 	taskDescription.placeholder = "Task Description...";
 	taskDescription.name = "task-description";
-	taskDescription.addEventListener("input", () => {
+	if (newTask.desc != undefined) taskDescription.value = newTask.desc;
+	taskDescription.addEventListener("input", (e) => {
 		taskDescription.style.height = "";
 		taskDescription.style.height = taskDescription.scrollHeight + 6 + "px";
+		taskDescription.value = e.target.value;
+		updateTask(newTask, "desc", e);
 	});
 
 	taskBlock.appendChild(taskDescription);
@@ -281,7 +288,6 @@ function buildTaskUI(newTask) {
 	const subtaskWrapper = document.createElement("div");
 	subtaskWrapper.className = "subtask-wrapper";
 	taskBlock.appendChild(subtaskWrapper);
-
 	// const projId = document.createElement("h4");
 	// projId.textContent = newProj.id;
 	// projId.className = `project-id`;
@@ -289,25 +295,34 @@ function buildTaskUI(newTask) {
 	taskContainer.appendChild(taskBlock);
 }
 
-function updateTask(attribute, value) {
-	attribute = value;
-	localStorage.setItem("TaskList", JSON.stringify(taskList));
+function updateTask(newTask, prop, e) {
+	taskList = JSON.parse(localStorage.getItem("TaskList") || '[]');
+	for (const task of taskList) {
+		if (task._id == newTask._id) {
+			task[prop] = e.target.value;
+			localStorage.setItem("TaskList", JSON.stringify(taskList));
+		}
+	}
 }
 
+
 function loadTasks() {
-	const tasks = JSON.parse(localStorage.getItem("TaskList"));
-	if (tasks) {
-		tasks.forEach((element) => {
+	taskList = JSON.parse(localStorage.getItem("TaskList") || '[]');
+	if (taskList) {
+		taskList.forEach((element) => {
 			buildTaskUI(element);
+			for (const subTask of element.subTaskList) {
+				buildSubTaskUI(subTask, element);
+			}
 		});
 	}
 }
 
 function removeTasks(deletedTask) {
-	const tasks = JSON.parse(localStorage.getItem("TaskList"));
-	if (tasks) {
-		tasks.forEach((element) => {
-			let tasks = JSON.parse(localStorage.getItem("TaskList"));
+	taskList = JSON.parse(localStorage.getItem("TaskList") || '[]');
+	if (taskList) {
+		taskList.forEach((element) => {
+			let tasks = JSON.parse(localStorage.getItem("TaskList") || '[]');
 			if (tasks) {
 				taskList = tasks.filter((task) => task._id != deletedTask._id);
 				localStorage.setItem("TaskList", JSON.stringify(taskList));
@@ -318,15 +333,16 @@ function removeTasks(deletedTask) {
 
 class SubTask {
 	constructor() {
-		this.id = self.crypto.randomUUID();
+		this.id = `subtask_${self.crypto.randomUUID()}`;
 		this.complete = false;
-		this.title = "";
+		this.value = "";
 	}
-	get title() {
-		return this._title;
+
+	set value(text) {
+		this._value = text;
 	}
-	set title(text) {
-		this._title = text;
+	get value() {
+		return this._value;
 	}
 	get complete() {
 		return this._complete;
@@ -336,38 +352,44 @@ class SubTask {
 	}
 }
 
-function makeSubTask(taskBlock) {
+function makeSubTask(parentTask) {
 	const subTask = new SubTask();
+	parentTask.subTaskList.push(subTask);
+	buildSubTaskUI(subTask, parentTask);
+	localStorage.setItem("TaskList", JSON.stringify(taskList));
+}
+
+function buildSubTaskUI(subTask, parentTask) {
+	const taskBlock = document.querySelector(`#${parentTask._id}`);
 
 	const subtaskContainer = document.createElement("div");
-	subtaskContainer.id = `subtask_${subTask.id}`;
+	subtaskContainer.id = subTask.id;
 	subtaskContainer.className = "subtask-container";
+	if (subTask._complete) { subtaskContainer.classList.add("task-completed"); }
 
 	const subtaskTitle = document.createElement("input");
 	subtaskTitle.className = "subtask-title";
 	subtaskTitle.placeholder = "Task...";
 	subtaskTitle.name = "subtask-title";
 	subtaskTitle.type = "text";
-	subtaskTitle.title = "Sub-Task Title";
-	subtaskTitle.addEventListener("change", (e) => {
-		subTask.title = e.target.value;
-		console.log(`${subTask.title} is ${subTask.complete}`);
-	});
+	subtaskTitle.value = subTask._value;
+
+	subtaskTitle.title = "Sub Task";
 
 	subtaskContainer.appendChild(subtaskTitle);
 
 	const subtaskCheck = document.createElement("input");
 	subtaskCheck.className = "subtask-check";
-	subtaskCheck.checked = subTask.complete;
+	subtaskCheck.checked = subTask._complete;
 	subtaskCheck.name = "subtask-check";
 	subtaskCheck.type = "checkbox";
 	subtaskCheck.title = "Sub-Task Completed";
-	subtaskCheck.addEventListener("change", (e) => {
-		subTask.complete = e.target.checked;
+	if (subtaskCheck.checked != undefined) subtaskCheck.checked = subTask._complete;
+	subtaskCheck.addEventListener("click", (e) => {
+		localStorage.setItem("TaskList", JSON.stringify(taskList));
 		if (subTask.complete) {
 			subtaskContainer.classList.add("task-completed");
 		} else subtaskContainer.classList.remove("task-completed");
-		console.log(`${subTask.title} is ${subTask.complete}`);
 	});
 	subtaskContainer.appendChild(subtaskCheck);
 
@@ -381,6 +403,17 @@ function makeSubTask(taskBlock) {
 	});
 	subtaskContainer.appendChild(subtaskDelete);
 	taskBlock.appendChild(subtaskContainer);
+	subtaskTitle.addEventListener("keyup", (e) => {
+		updateSubTask(parentTask, "_value", subTask, e);
+	});
+}
+
+function updateSubTask(parentTask, prop, subTask, e) {
+	for (const sub of parentTask.subTaskList)
+		if (sub._id == subTask._id) {
+			subTask[prop] = e.target.value;
+			localStorage.setItem("TaskList", JSON.stringify(taskList));
+		}
 }
 
 buildProjButton();
